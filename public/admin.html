@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="robots" content="noindex">
+  <title>لوحة الإدارة — Ejad Mini Market</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/admin.css">
+</head>
+<body class="admin">
+  <header class="topbar">
+    <h1>لوحة الإدارة</h1>
+    <span class="row" style="margin:0;align-items:center">
+      <a href="/product" class="btn lock-btn">📦 المنتجات</a>
+      <a href="/" class="btn lock-btn">↩ التطبيق</a>
+      <button id="logout" class="btn lock-btn" hidden>🔒 خروج</button>
+    </span>
+  </header>
+
+  <main class="wide-main">
+    <!-- دخول المدير -->
+    <section id="login-view" hidden>
+      <form id="login-form" class="card narrow">
+        <h2>🔒 دخول المدير</h2>
+        <label class="field">كلمة السر
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <p id="login-error" class="error"></p>
+        <button class="btn primary wide">دخول</button>
+      </form>
+    </section>
+
+    <section id="app-view" hidden>
+      <nav class="seg admin-tabs">
+        <button data-tab="cash" class="active">💵 الصندوق</button>
+        <button data-tab="debts">📝 الديون</button>
+        <button data-tab="users">👥 الموظفين</button>
+        <button data-tab="stats">📊 إحصائيات</button>
+        <button data-tab="settings">⚙️ إعدادات</button>
+      </nav>
+
+      <!-- ===== الصندوق ===== -->
+      <div id="tab-cash" class="tab active">
+        <div class="day-bar">
+          <button id="day-prev" class="btn" aria-label="اليوم السابق">→</button>
+          <input id="day" type="date">
+          <button id="day-next" class="btn" aria-label="اليوم التالي">←</button>
+          <button id="day-today" class="btn">اليوم</button>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="kpi-label">مبيعات اليوم</div><div id="k-sales" class="kpi-val"></div></div>
+          <div class="kpi"><div class="kpi-label">لازم يكون بالصندوق</div><div id="k-cash" class="kpi-val accent"></div></div>
+          <div class="kpi"><div class="kpi-label">انباع دين</div><div id="k-credit" class="kpi-val"></div></div>
+          <div class="kpi"><div class="kpi-label">الفرق بعد الجرد</div><div id="k-diff" class="kpi-val"></div></div>
+        </div>
+
+        <form id="count-form" class="card">
+          <h3 class="h3 flush">🧮 جرد الصندوق</h3>
+          <p class="muted small">عدّ المصاري اللي بالصندوق لهاليوم واكتبها — النظام بيقارنها مع المفروض.</p>
+          <div class="row">
+            <input name="counted" inputmode="decimal" placeholder="المبلغ الفعلي" required>
+            <input name="note" placeholder="ملاحظة (اختياري)">
+          </div>
+          <div class="row">
+            <button class="btn primary">حفظ الجرد</button>
+            <button type="button" id="count-clear" class="btn danger" hidden>حذف الجرد</button>
+          </div>
+        </form>
+
+        <h3 class="h3">حركات اليوم</h3>
+        <ul id="day-entries" class="list"></ul>
+
+        <h3 class="h3">آخر ٣٠ يوم</h3>
+        <div class="table-wrap">
+          <table id="days-table" class="table">
+            <thead><tr><th>اليوم</th><th>مبيعات</th><th>لازم بالصندوق</th><th>الجرد</th><th>الفرق</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== الديون ===== -->
+      <div id="tab-debts" class="tab">
+        <div class="kpis">
+          <div class="kpi"><div class="kpi-label">مجموع الديون</div><div id="k-debt" class="kpi-val danger"></div></div>
+          <div class="kpi"><div class="kpi-label">عليهم دين</div><div id="k-debtors" class="kpi-val"></div></div>
+          <div class="kpi"><div class="kpi-label">كل الحسابات</div><div id="k-users" class="kpi-val"></div></div>
+        </div>
+        <ul id="debtors" class="list"></ul>
+      </div>
+
+      <!-- ===== الموظفين ===== -->
+      <div id="tab-users" class="tab">
+        <form id="new-user-form" class="card" autocomplete="off">
+          <h3 class="h3 flush">➕ حساب موظف جديد</h3>
+          <div class="row">
+            <input name="username" placeholder="اسم المستخدم (إنجليزي)" dir="ltr" autocapitalize="off" spellcheck="false" autocomplete="off" required>
+            <input name="password" type="text" placeholder="كلمة السر (٦+)" dir="ltr" autocomplete="off" minlength="6" required>
+          </div>
+          <button class="btn primary wide">إنشاء الحساب</button>
+        </form>
+        <h3 class="h3">كل الحسابات</h3>
+        <input id="user-filter" type="search" placeholder="ابحث عن موظف…" autocomplete="off">
+        <ul id="users" class="list"></ul>
+      </div>
+
+      <!-- ===== إحصائيات ===== -->
+      <div id="tab-stats" class="tab">
+        <div class="seg range">
+          <button data-days="7">٧ أيام</button>
+          <button data-days="30" class="active">٣٠ يوم</button>
+          <button data-days="90">٣ شهور</button>
+          <button data-days="365">سنة</button>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="kpi-label">المبيعات</div><div id="s-sales" class="kpi-val"></div></div>
+          <div class="kpi"><div class="kpi-label">الكاش المستلم</div><div id="s-cash" class="kpi-val"></div></div>
+          <div class="kpi"><div class="kpi-label">الديون الحالية</div><div id="s-debt" class="kpi-val danger"></div><div id="s-debtors" class="muted small"></div></div>
+          <div class="kpi"><div class="kpi-label">معدل يوم البيع</div><div id="s-avg" class="kpi-val"></div></div>
+          <div class="kpi"><div class="kpi-label">عمليات شراء</div><div id="s-count" class="kpi-val"></div></div>
+          <div class="kpi"><div class="kpi-label">فرق الجرد (مجموع)</div><div id="s-diff" class="kpi-val"></div></div>
+        </div>
+        <div class="card">
+          <h3 class="h3 flush">المبيعات اليومية</h3>
+          <div id="chart" class="chart"></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <h3 class="h3 flush">الأكثر مبيعاً</h3>
+            <ol id="top-products" class="rank"></ol>
+          </div>
+          <div class="card">
+            <h3 class="h3 flush">أكثر الموظفين شراءً</h3>
+            <ol id="top-users" class="rank"></ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== إعدادات ===== -->
+      <div id="tab-settings" class="tab">
+        <form id="settings-form" class="card">
+          <label class="field">توقيت المحل (لتحديد بداية ونهاية اليوم)
+            <input name="timezone" dir="ltr" list="tz-list" placeholder="Asia/Riyadh">
+          </label>
+          <datalist id="tz-list">
+            <option value="Asia/Riyadh"><option value="Asia/Damascus"><option value="Asia/Beirut"><option value="Asia/Amman">
+            <option value="Asia/Dubai"><option value="Asia/Kuwait"><option value="Asia/Baghdad"><option value="Africa/Cairo"><option value="Europe/Istanbul">
+          </datalist>
+          <label class="field">العملة
+            <input name="currency" placeholder="مثلاً: ر.س">
+          </label>
+          <button class="btn primary">حفظ</button>
+        </form>
+        <p class="muted small">إضافة وتعديل المنتجات من صفحة <a href="/product">/product</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- تفاصيل موظف -->
+  <dialog id="user-dialog">
+    <div class="dlg-head">
+      <div>
+        <h2 id="u-name"></h2>
+        <div id="u-meta" class="muted small"></div>
+      </div>
+      <button id="u-close" class="btn small-btn" aria-label="إغلاق">✕</button>
+    </div>
+    <div id="u-balance" class="balance"></div>
+
+    <form id="u-entry-form" class="card">
+      <div class="seg">
+        <button type="button" data-type="payment" class="active">💰 استلمت منه</button>
+        <button type="button" data-type="charge">📝 سجّل عليه</button>
+      </div>
+      <div class="row">
+        <input name="amount" inputmode="decimal" placeholder="المبلغ" required>
+        <input name="note" placeholder="ملاحظة">
+      </div>
+      <label class="check" id="u-inbox-wrap"><input type="checkbox" name="inBox" checked> المبلغ انحط بالصندوق</label>
+      <button class="btn primary wide">تسجيل</button>
+    </form>
+
+    <ul id="u-entries" class="list"></ul>
+
+    <details class="tools">
+      <summary>إدارة الحساب</summary>
+      <form id="u-pw-form" class="row">
+        <input name="password" type="text" placeholder="كلمة سر جديدة (٦+)" autocomplete="off" minlength="6" required>
+        <button class="btn">تعيين</button>
+      </form>
+      <div class="row"><button id="u-toggle" class="btn danger"></button></div>
+    </details>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="/admin.js"></script>
+</body>
+</html>

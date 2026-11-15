@@ -1,0 +1,284 @@
+/* خط ثمانية (Thmanyah Sans) — © شركة ثمانية للنشر والتوزيع */
+@font-face {
+  font-family: "Thmanyah";
+  src: url("fonts/thmanyah-regular.woff2") format("woff2");
+  font-weight: 400 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Thmanyah";
+  src: url("fonts/thmanyah-bold.woff2") format("woff2");
+  font-weight: 600 900;
+  font-display: swap;
+}
+
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #0f766e;
+  --primary-ink: #ffffff;
+  --danger: #dc2626;
+  --ok-bg: #ecfdf5;
+  --warn-bg: #fff7ed;
+  --radius: 14px;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0f14;
+    --surface: #151b23;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --border: #273140;
+    --primary: #14b8a6;
+    --primary-ink: #04201d;
+    --danger: #f87171;
+    --ok-bg: #062a24;
+    --warn-bg: #2a1a06;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: "Thmanyah", system-ui, -apple-system, "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  -webkit-tap-highlight-color: transparent;
+}
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.topbar h1 { font-size: 18px; margin: 0; }
+
+main { max-width: 640px; margin: 0 auto; padding: 16px; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* ===== camera ===== */
+.camera {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.camera video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.frame {
+  position: absolute; inset: 25% 10%;
+  border: 3px solid rgba(255,255,255,.9);
+  border-radius: 12px;
+  box-shadow: 0 0 0 999px rgba(0,0,0,.28);
+  overflow: hidden;
+}
+.laser {
+  position: absolute; left: 0; right: 0; top: 50%;
+  height: 2px; background: #ef4444; box-shadow: 0 0 8px #ef4444;
+  animation: sweep 1.8s ease-in-out infinite alternate;
+}
+@keyframes sweep { from { top: 10%; } to { top: 90%; } }
+@media (prefers-reduced-motion: reduce) { .laser { animation: none; } }
+.camera:not(.live) .frame { display: none; }
+.cam-msg {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  color: #fff; text-align: center; padding: 16px; font-size: 15px;
+}
+.camera.live .cam-msg { display: none; }
+.camera.flash { outline: 4px solid #22c55e; outline-offset: -4px; }
+
+/* ===== controls ===== */
+.row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px 16px;
+  min-height: 46px;
+  border-radius: 12px;
+  font: inherit; font-weight: 600;
+  cursor: pointer;
+}
+.btn:active { transform: scale(.98); }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.btn.danger { color: var(--danger); }
+.btn.block { flex: 1; }
+
+input {
+  width: 100%;
+  font: inherit; font-size: 16px; /* يمنع التكبير التلقائي في iOS */
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-height: 46px;
+}
+input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+.field { display: grid; gap: 6px; margin: 12px 0; font-weight: 600; font-size: 14px; }
+.input-group { display: flex; gap: 8px; }
+.input-group input { flex: 1; min-width: 0; }
+
+/* ===== scan result ===== */
+.result {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  animation: pop .18s ease-out;
+}
+@keyframes pop { from { transform: scale(.97); opacity: .5; } }
+.result.found { background: var(--ok-bg); }
+.result.missing { background: var(--warn-bg); }
+.result .name { font-size: 24px; font-weight: 700; line-height: 1.4; }
+.result .price { font-size: 46px; font-weight: 800; color: var(--primary); margin: 6px 0; }
+.result .code { color: var(--muted); font-size: 14px; direction: ltr; }
+.result .row { justify-content: center; }
+
+/* ===== lists ===== */
+.list { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 8px; }
+.item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.item-main { flex: 1; min-width: 0; }
+.item-name { font-weight: 600; overflow-wrap: anywhere; }
+.item-code { color: var(--muted); font-size: 13px; direction: ltr; text-align: right; }
+.item-price { font-weight: 800; color: var(--primary); white-space: nowrap; }
+.empty { text-align: center; color: var(--muted); padding: 32px 8px; }
+mark { background: #fde68a; color: inherit; border-radius: 3px; }
+
+.tools {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.tools summary { cursor: pointer; font-weight: 600; }
+
+/* ===== bottom tabs ===== */
+.tabs {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tabs button {
+  flex: 1;
+  appearance: none; border: 0; background: none;
+  font: inherit; font-size: 13px; color: var(--muted);
+  padding: 8px 0 10px;
+  display: grid; justify-items: center; gap: 2px;
+  cursor: pointer;
+}
+.tabs button span { font-size: 22px; }
+.tabs button.active { color: var(--primary); font-weight: 700; }
+
+/* ===== dialogs ===== */
+dialog {
+  width: min(520px, calc(100vw - 32px));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 20px;
+}
+dialog::backdrop { background: rgba(0,0,0,.45); }
+dialog h2 { margin: 0 0 4px; font-size: 20px; }
+
+.lock-btn { min-height: 36px; padding: 6px 12px; font-size: 14px; }
+.error { color: var(--danger); font-size: 14px; min-height: 1.2em; margin: 4px 0 0; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom));
+  transform: translateX(-50%) translateY(20px);
+  background: #111827; color: #fff;
+  padding: 10px 16px; border-radius: 999px;
+  font-size: 14px; max-width: calc(100vw - 32px);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 100;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ===== حسابي ===== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.seg { display: flex; gap: 4px; background: var(--bg); border-radius: 12px; padding: 4px; margin-bottom: 4px; }
+.seg button {
+  flex: 1; appearance: none; border: 0; background: none; color: var(--muted);
+  font: inherit; font-weight: 600; padding: 10px 6px; border-radius: 9px; cursor: pointer;
+}
+.seg button.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.btn.wide { width: 100%; margin: 8px 0; }
+.h3 { font-size: 16px; margin: 22px 0 4px; }
+
+.balance-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  text-align: center;
+  display: grid; gap: 6px; justify-items: center;
+}
+.balance { font-size: 34px; font-weight: 800; }
+.balance.owe { color: var(--danger); }
+.balance.clear { color: var(--primary); }
+
+/* أزرار الشراء المباشر */
+.qty { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; }
+.qty .btn { width: 52px; min-height: 52px; padding: 0; font-size: 26px; font-weight: 700; }
+.qty-n { min-width: 44px; text-align: center; font-size: 26px; font-weight: 800; }
+.qty-total { margin-top: 6px; text-align: center; font-weight: 700; color: var(--primary); }
+.buy-row { margin-top: 10px; }
+.buy-row .btn { flex: 1; min-height: 52px; font-size: 17px; font-weight: 700; }
+.bought { margin-top: 10px; font-size: 18px; font-weight: 700; color: var(--primary); }
+#buy-dialog { width: min(420px, calc(100vw - 24px)); text-align: center; }
+.buy-box { margin-bottom: 10px; }
+.buy-box .name { font-size: 22px; font-weight: 700; line-height: 1.4; }
+.buy-box .price { font-size: 40px; font-weight: 800; color: var(--primary); margin: 4px 0; }
+
+.entry {
+  display: flex; gap: 12px; align-items: flex-start;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px;
+}
+.entry.voided { opacity: .5; }
+.entry.voided .item-price { text-decoration: line-through; }
+.entry-side { display: grid; gap: 6px; justify-items: end; }
+.item-price.pos { color: #16a34a; }
+.item-price.debt { color: var(--danger); }
+.small-btn { min-height: 32px; padding: 4px 10px; font-size: 13px; }
+.tag {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 999px; padding: 1px 8px; vertical-align: middle;
+}
+
+
+/* صفحة /product: بدون شريط التبويبات */
+body.product-page .tabs { display: none; }
+body.product-page { padding-bottom: 24px; }

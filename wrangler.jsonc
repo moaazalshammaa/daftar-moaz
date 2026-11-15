@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ejad-mini-market",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-11-01",
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/product", "/product/"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ejad-mini-market-db",
+      "database_id": "50e7e396-0054-4000-8f58-21fcf3614525",
+      "migrations_dir": "migrations"
+    }
+  ]
+  // كلمة سر المدير سرّية ولا تُكتب هنا:
+  //   npx wrangler secret put ADMIN_PASSWORD
+}
