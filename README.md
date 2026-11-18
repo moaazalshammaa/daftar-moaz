@@ -38,10 +38,63 @@ npx wrangler secret put ADMIN_PASSWORD     # كلمة سر المدير
 ## التطوير المحلي
 
 ```bash
-echo "ADMIN_PASSWORD=test1234" > .dev.vars
+echo "ADMIN_PASSWORD=<كلمة-سر-للتجربة>" > .dev.vars
 npm run db:migrate:local
 npm run dev            # http://localhost:8787
 ```
+
+## التشغيل على حساب Cloudflare جديد (نقل المشروع)
+
+بتحتاج: حساب Cloudflare فيه الدومين، و Node.js 20 أو أحدث.
+
+```bash
+git clone https://github.com/moaazalshammaa/daftar-moaz.git ejad-mini-market
+cd ejad-mini-market
+npm install
+npx wrangler login
+```
+
+**١. قاعدة البيانات**
+
+```bash
+npx wrangler d1 create ejad-mini-market-db
+```
+
+انسخ `database_id` اللي بيطلع وحطه بـ `wrangler.jsonc` مكان القديم.
+
+- **مع نقل البيانات القديمة:** ملف `ejad-data.sql` بيوصلك بشكل خاص (مو على GitHub، لأن فيه حسابات الموظفين وديونهم). فيه الجداول والبيانات وسجل الـ migrations، فـ **لا تشغّل** `db:migrate:remote` قبله:
+
+  ```bash
+  npx wrangler d1 execute ejad-mini-market-db --remote --file=ejad-data.sql
+  ```
+
+- **تشغيل جديد بدون بيانات:** `npm run db:migrate:remote`
+
+**٢. كلمة سر المدير**
+
+```bash
+npx wrangler secret put ADMIN_PASSWORD
+```
+
+**٣. النشر والدومين**
+
+ضيف الدومين بـ `wrangler.jsonc` (مثال `mine.ejad.net`، والدومين لازم يكون على نفس حساب Cloudflare):
+
+```jsonc
+"routes": [{ "pattern": "mine.ejad.net", "custom_domain": true }],
+```
+
+```bash
+npm run deploy
+```
+
+Cloudflare بيعمل سجل الـ DNS وشهادة https لحاله. ما في رابط أو دومين مكتوب بالكود، فبيشتغل على أي دومين.
+
+**٤. فحص**
+
+- افتح الرابط ← البحث بيطلّع المنتجات.
+- `/admin` ← ادخل بكلمة سر المدير ← بيبينوا الموظفين والديون.
+- الموظفين بيدخلوا بنفس أسمائهم وكلمات سرهم القديمة، بس لازم يفتحوا الرابط الجديد ويسجلوا دخول من جديد (ويرجعوا يضيفوه عالشاشة الرئيسية).
 
 ## النشر
 
