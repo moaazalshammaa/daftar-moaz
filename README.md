@@ -68,6 +68,9 @@ npx wrangler d1 create ejad-mini-market-db
   npx wrangler d1 execute ejad-mini-market-db --remote --file=ejad-data.sql
   ```
 
+  شغّله من الـ terminal بهالأمر، مو بلصق الملف بـ Console قاعدة البيانات بلوحة Cloudflare (بيطلع `incomplete input`).
+  إذا فشل الاستيراد بالنص، احذف القاعدة وأنشئها من جديد (`wrangler d1 delete` ثم `create`) قبل ما تعيد.
+
 - **تشغيل جديد بدون بيانات:** `npm run db:migrate:remote`
 
 **٢. كلمة سر المدير**
